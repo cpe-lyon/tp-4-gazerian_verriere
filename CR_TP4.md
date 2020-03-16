@@ -1,20 +1,16 @@
-GAZERIAN Nicolas
-VERRIERE Nicolas
-4ETI
+### GAZERIAN Nicolas, VERRIERE Nicolas - 4ETI
 
+# **Exercice 1 : Gestion des utilisateurs et des groupes**
 
-**Exercice 1 : Gestion des utilisateurs et des groupes**
-
-*Question 1) Commencez par créer deux groupes groupe1 et groupe2*
+### *Question 1) Commencez par créer deux groupes groupe1 et groupe2*
 
 ``` bash
 sudo addgroup groupe1
 sudo addgroup groupe2
 ```
-> Pour effectuer ces commandes, il faut entrer le mot de passe de l'admin.
+> Pour effectuer ces commandes, il faut aussi entrer le mot de passe de l'admin.
 
-*Question 2) Créez ensuite 4 utilisateurs u1, u2, u3, u4 avec la commande useradd, en demandant la création de
-leur dossier personnel et avec bash pour shell*
+### *Question 2) Créez ensuite 4 utilisateurs u1, u2, u3, u4 avec la commande useradd, en demandant la création de leur dossier personnel et avec bash pour shell*
 
 ``` bash
 sudo useradd u1
@@ -36,7 +32,7 @@ chown u4: u4
 ```
 
 
-*Question 3) Ajoutez les utilisateurs dans les groupes créés :*
+### *Question 3) Ajoutez les utilisateurs dans les groupes créés :*
 
 *- u1, u2, u4 dans groupe1*
 
@@ -52,7 +48,7 @@ usermod -a -G groupe2 u3
 usermod -a -G groupe2 u4
 ```
 
-*Question 4) Donnez deux moyens d’afficher les membres de groupe2*
+### *Question 4) Donnez deux moyens d’afficher les membres de groupe2*
 
 ```bash
 cat /etc/group
@@ -65,8 +61,7 @@ grep ^groupe2: /etc/group | cut -d : -f4
 > Cette commande permet d'afficher le 4è paramètre de la ligne de etc/group commençant par groupe2, donc seulement les utilisateurs du groupe 2.
 
 
-*Question 5) Faites de groupe1 le groupe propriétaire de /home/u1 et /home/u2 et de groupe2 le groupe propriétaire
-de /home/u3 et /home/u4*
+### *Question 5) Faites de groupe1 le groupe propriétaire de /home/u1 et /home/u2 et de groupe2 le groupe propriétaire de /home/u3 et /home/u4*
 
 > Pour cela, nous faisons les commandes suivantes : 
 ```bash
@@ -77,7 +72,7 @@ sudo chgrp groupe2 /home/u4
 ```
 > Pour vérifier, on utilise la commande *ls -l /home* et on voit que les correspondances ont bie nété faites.
 
-*Question 6) Remplacez le groupe primaire des utilisateurs :*
+### *Question 6) Remplacez le groupe primaire des utilisateurs :*
 
 ```bash
 sudo usermod u1 -g groupe1
@@ -85,7 +80,7 @@ sudo usermod u2 -g groupe1
 sudo usermod u3 -g groupe2
 sudo usermod u4 -g groupe2
 ```
-*Question 7) Créez deux répertoires /home/groupe1 et /home/groupe2 pour le contenu commun aux groupes, et
+### *Question 7) Créez deux répertoires /home/groupe1 et /home/groupe2 pour le contenu commun aux groupes, et
 mettez en place les permissions permettant aux membres de chaque groupe d’écrire dans le dossier
 associé.*
 
@@ -106,14 +101,14 @@ sudo chgrp groupe1 /home/groupe1
 sudo chmod g+w /home/groupe1
 sudo chmod g+w /home/groupe2
 ```
-*Question 8) Comment faire pour que, dans ces dossiers, seul le propriétaire d’un fichier ait le droit de renommer
+### *Question 8) Comment faire pour que, dans ces dossiers, seul le propriétaire d’un fichier ait le droit de renommer
 ou supprimer ce fichier ?*
 
 > Laisser les droits de modification à seulement l'utilisateur revient donc à le retirer à tous les autres utilisateurs (membres du groupe ou non).
 Pour cela on utiliserait les commandes **sudo chmod g-w** et **sudo chmod o-w**
 
 
-*Question 9) Pouvez-vous vous connecter en tant que u1 ? Pourquoi ?*
+### *Question 9) Pouvez-vous vous connecter en tant que u1 ? Pourquoi ?*
 
 > Non, en effet : "Tout compte créé sans mot de passe est inactif, jusqu’à l’attribution d’un mot de passe" selon le cours
 
@@ -132,7 +127,7 @@ sudo passwd u1
 su u1
 ```
 
-*Question 11) Quels sont l’uid et le gid de u1 ?*
+### *Question 11) Quels sont l’uid et le gid de u1 ?*
 
 > Pour obtenir ces IDs, on fait :
 
@@ -142,28 +137,28 @@ $ id u1
 uid=1001(u1) gid=1001(groupe1) groups=1001(groupe1)
 ```
 
-*Question 12) Quel utilisateur a pour uid 1003 ?*
+### *Question 12) Quel utilisateur a pour uid 1003 ?*
 
 > Les IDs sont itérés de 1 à partir de 1001 pour chaque utilisateurs créé. C'est donc u3.
 
 
-*Question 13) Quel est l’id du groupe groupe1 ?*
+### *Question 13) Quel est l’id du groupe groupe1 ?*
 
 > Avec la commande précédente, on peut voir le nom et le numéro de groupe. On sait donc que c'est 1001.
 
 
-*Question 14) Quel groupe a pour guid 1002 ?*
+### *Question 14) Quel groupe a pour guid 1002 ?*
 
 > C'est le groupe 2 car les itérations se font de la même manière. On peut aussi le vérifier **id u2**.
 
-*Question 15) Retirez l’utilisateur u3 du groupe groupe2. Que se passe-t-il ? Expliquez*
+### *Question 15) Retirez l’utilisateur u3 du groupe groupe2. Que se passe-t-il ? Expliquez*
 
 > Il faut entrer le mot de passe de l'admin pour pouvoir supprimer l'utilisateur du groupe.
 On peut vérifier comme en question 4 que le groupe groupe2 ne contient plus u3, mais le dossier groupe2 en reste propriétaire. 
 Les membres de groupe2 ont donc toujours les mêmes droits qu'avant sur u3.
 
 
-*Question 16 ) Modifiez le compte de u4 de sorte que :*
+### *Question 16 ) Modifiez le compte de u4 de sorte que :*
 
 *— il expire au 1er juin 2020*
 
@@ -187,7 +182,7 @@ sudo chage -I 30 u4
 ```
 
 
-*Question 17) Quel est l’interpréteur de commandes (Shell) de l’utilisateur root ?*
+### *Question 17) Quel est l’interpréteur de commandes (Shell) de l’utilisateur root ?*
 
 > Pour connaitre l'nterpréteur de commande du root il faut appliquer la commande :
 
@@ -201,22 +196,22 @@ root:x:0:0:root:/root:/bin/bash
 ```
 > Comme indiqué dans le cours, le dernier paramètre est l'interpréteur de commande, soit "/bin/bash".
 
-*Question 18) à quoi correspond l’utilisateur nobody ?*
+### *Question 18) à quoi correspond l’utilisateur nobody ?*
 
 > Nobody est une pseudo utilisateur qui en représente un n'ayant aucun privilège, n'étant propriétaire d'aucun fichier et n'appartenant à aucun groupe.
 
 
-*Question 19) Par défaut, combien de temps la commande sudo conserve-t-elle votre mot de passe en mémoire ?*
-*Quelle commande permet de forcer sudo à oublier votre mot de passe ?*
+### *Question 19) Par défaut, combien de temps la commande sudo conserve-t-elle votre mot de passe en mémoire ?*
+### *Quelle commande permet de forcer sudo à oublier votre mot de passe ?*
 
 > Selon ask ubuntu.com, par défaut sudo le garde en mémoire 15 minutes.
 C'est la commande **sudo –k** qui permet d'empêcher sudo de garder notre mot de passe.
 
 
 
-**Exercice 2 : Gestion des permissions**
+# **Exercice 2 : Gestion des permissions**
 
-*1) Dans votre $HOME, créez un dossier test, et dans ce dossier un fichier fichier contenant quelques lignes de texte. Quels sont les droits sur test et fichier ?*
+### *Question 1) Dans votre $HOME, créez un dossier test, et dans ce dossier un fichier fichier contenant quelques lignes de texte. Quels sont les droits sur test et fichier ?*
 
 
 
