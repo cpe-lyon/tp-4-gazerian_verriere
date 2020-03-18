@@ -112,7 +112,7 @@ Pour cela on utiliserait les commandes **sudo chmod g-w** et **sudo chmod o-w**
 
 > Non, en effet : "Tout compte créé sans mot de passe est inactif, jusqu’à l’attribution d’un mot de passe" selon le cours
 
-*Question 10) Activez le compte de l’utilisateur u1 et vérifiez que vous pouvez désormais vous connecter avec son compte.*
+### *Question 10) Activez le compte de l’utilisateur u1 et vérifiez que vous pouvez désormais vous connecter avec son compte.*
 
 > Pour activer un utilisateur, il faut donc lui attribuer un mot de passe : 
 
@@ -150,6 +150,7 @@ uid=1001(u1) gid=1001(groupe1) groups=1001(groupe1)
 ### *Question 14) Quel groupe a pour guid 1002 ?*
 
 > C'est le groupe 2 car les itérations se font de la même manière. On peut aussi le vérifier **id u2**.
+
 
 ### *Question 15) Retirez l’utilisateur u3 du groupe groupe2. Que se passe-t-il ? Expliquez*
 
@@ -211,7 +212,191 @@ C'est la commande **sudo –k** qui permet d'empêcher sudo de garder notre mot 
 
 # **Exercice 2 : Gestion des permissions**
 
-### *Question 1) Dans votre $HOME, créez un dossier test, et dans ce dossier un fichier fichier contenant quelques lignes de texte. Quels sont les droits sur test et fichier ?*
+### *Question 1) Dans votre $HOME, créez un dossier* **test** *, et dans ce dossier un fichier* **fichier** *contenant quelques lignes de texte. Quels sont les droits sur test et fichier ?*
+
+> On utilise les commandes suivantes :
+```bash
+mkdir test
+touch fichier
+cat > fichier
+(entrer les lignes de texte puis CTR+C)
+ls -l #affiche les droits de fichier.txt : -rw-r--r--
+cd ..
+ls -l #affiche les droits de tous les dossier dans home dont "test" : drwx-r-xr-x
+```
+
+> Les lettres r, w, x correspondent respectivement à un droit de lecture, d'écriture et d'éxécution.
+> La lettre d et le caractère - en début de ligne expriment que les droits traitent respectivement d'un dossier et d'un fichier "normal".
+
+
+### *Question 2) Retirez tous les droits sur ce fichier (même pour vous), puis essayez de le modifier et de l’aﬀicher en tant que root. Conclusion?*
+
+> On utilise les commandes suivantes :
+```bash
+cd test/
+chmod 000 fichier
+cat > fichier
+permission denied
+sudo cat > fichier 
+permission denied
+sudo su
+cat > fichier
+??? #modification
+cat fichier.txt
+??? #affichage du fichier modifié
+exit #On sort du mode root
+```
+
+> En tant que root, il reste possible de modifier le fichier. Par défaut, root a les droits rw sur tous les fichiers malgré les permissions d'utilisateur, de groupe et des autres.
+
+
+### *Question 3) Redonnez vous les droits en écriture et exécution sur fichier puis exécutez la commande :
+```bash
+chmod 300 fichier
+ls -l
+echo "echo Hello" > fichier
+```
+### On a vu lors des TP précédents que cette commande remplace le contenu d’un fichier s’il existe déjà. Que peut-on dire au sujet des droits?*
+> Le remplacement du contenu d'un fichier correspond à de l'écriture. C'est pourquoi il nous est possible de le faire puisqu'on a récupéré les droits d'écriture.
+> En revanche nous n'avons pas le droit de lecture, il faut donc écrire **sudo cat fichier** pour pouvoir le lire.
+
+
+### *Question 4) Essayez d’exécuter le fichier. Est-ce que cela fonctionne? Et avec sudo? Expliquez.*
+```bash
+./fichier
+permission denied
+sudo ./fichier
+Hello
+```
+> La commande ne fonctionne pas sans sudo car l'utilisateur n'a pas la permission en lecture. On ne peut pas lire le code sans être super utilisateur.
+
+### *Question 5) Placez-vous dans le répertoire test, et retirez-vous le droit en lecture pour ce répertoire. Listez le contenu du répertoire, puis exécutez ou aﬀichez le contenu du fichier fichier. Qu’en déduisez-vous? Rétablissez le droit en lecture sur test.*
+```bash
+sudo chmod u-r test
+cd test/
+ls
+fichier
+./fichier
+permission denied
+```
+> Le fichier fichier est à l'intérieur du dossier test et l'utilisateur n'a pas la permission de lecture sur ce dossier. On en déduit que cette abscence d'autorisation est la même pour le contenu du dossier.
+> Nous ne pouvons pas exécuter ou lire. Nous n'avons pas les droits correspondant sur fichier. En revanche si on retire la lecture sur le répertoire test mais qu'on le récupère directement sur le fichier, alors on peut afficher et exécuter. On en déduit que les règles les plsu spécifiques prennent le dessus.
+
+### *Question 6) Créez dans test un fichier nouveau ainsi qu’un répertoire sstest. Retirez au fichier nouveau et au répertoire test le droit en écriture. Tentez de modifier le fichier nouveau. Rétablissez ensuite le droit en écriture au répertoire test. Tentez de modifier le fichier nouveau, puis de le supprimer. Que pouvez vous déduire de toutes ces manipulations?*
+```bash
+sudo chmod a-w test #retire le droit en ecriture
+cd test
+
+touch nouveau
+mkdir test
+
+sudo chmod a-w nouveau #retire le droit en ecriture
+
+
+cat > nouveau
+permission denied
+sudo cat > nouveau
+permission denied
+
+
+cd ..
+sudo chmod a+w test
+
+cd test
+cat > nouveau
+permission denied
+sudo cat > nouveau 
+permission denied
+rm nouveau #fichier supprimé
+```
+
+> On déduit de ces résultats que le droit d'écriture sur le fichier est nécessaire à sa modification mais pas à sa suppression. La suppression d'un fichier n'est apparemment pas liée au droit d'écriture.
+
+### *Question 7) Positionnez vous dans votre répertoire personnel, puis retirez le droit en exécution du répertoire test. Tentez de créer, supprimer, ou modifier un fichier dans le répertoire test, de vous y déplacer, d’en lister le contenu, etc… Qu’en déduisez vous quant au sens du droit en exécution pour les répertoires?* 
+```bash
+cd
+sudo chmod a-x /home/test
+
+rm /home/test/fichier
+permission denied
+touch /home/test/fichier2
+permission denied
+cat > /home/test/fichier2
+permission denied
+cd /home/test
+permission denied
+ls -l /home/test #affiche les fichiers et les dossiers mais pas leurs infos sur les droits ou leur groupe/utilisateur
+```
+> Nous comprenons qu'une autorisation sur un fichier se répecture sur ses sous-dossiers, mais pas l'inverse. Globalement, un droit d'exécution sur le répertoire permet d'effectuer les actions de base.
+
+
+### *Question 8) Rétablissez le droit en exécution du répertoire test. Positionnez vous dans ce répertoire et retirez lui à nouveau le droit d’exécution. Essayez de créer, supprimer et modifier un fichier dans le répertoire test, de vous déplacer dans ssrep, de lister son contenu. Qu’en concluez-vous quant à l’influence des droits que l’on possède sur le répertoire courant? Peut-on retourner dans le répertoire parent avec ”cd ..”? Pouvez-vous donner une explication?*
+```bash
+sudo chmod a+x /home/test
+cd /home/test
+sudo chmod a-x /home/test
+
+touch file
+permission denied
+rm fichier
+permission denied
+cd sstest
+permission denied
+cat > fichier
+permission denied
+ls sstest
+permission denied
+
+cd ..
+#Pas d'erreur, cela fonctionne bien
+```
+> L'abscence de droits sur le répertoire courant bloque quasiment toutes les actions sauf le déplacement vers le répertoire parent. Cela permet de ne pas rester totalement bloqué dans un dossier desquels on n'a pas (ou plus) les droits.
+
+### *Question 9) Rétablissez le droit en exécution du répertoire test. Attribuez au fichier fichier les droits suﬀisants pour qu’une autre personne de votre groupe puisse y accéder en lecture, mais pas en écriture.*
+
+> Sachant que les droits actuels de fichier sont : - -wx------ on exécute :
+```bash
+sudo chmod a+x test
+cd test
+chmod g+r fichier
+```
+
+### *Question 10) Définissez un umask très restrictif qui interdit à quiconque à part vous l’accès en lecture ou en écriture, ainsi que la traversée de vos répertoires. Testez sur un nouveau fichier et un nouveau répertoire.*
+> Le umask doit être : 077
+```bash
+umask 077
+touch fichier2
+mkdir test2
+ls -l 
+```
+> Les droits pour fichier 2 et test2 sont respectivement : -rw------- et test2 : drwx------
+> Pour réinitialiser le masque, on doit fermer la session.
+
+### *Question 11) Définissez un umask très permissif qui autorise tout le monde à lire vos fichiers et traverser vos répertoires, mais n’autorise que vous à écrire. Testez sur un nouveau fichier et un nouveau répertoire.*
+
+### *Question 12) Définissez un umask équilibré qui vous autorise un accès complet et autorise un accès en lecture aux membres de votre groupe. Testez sur un nouveau fichier et un nouveau répertoire.*
+
+### *Question 13) Transcrivez les commandes suivantes de la notation classique à la notation octale ou vice-versa (vous pourrez vous aider de la commande stat pour valider vos réponses) :*
+- *chmod u=rx,g=wx,o=r fic*
+- *chmod uo+w,g-rx fic* en sachant que les droits initiaux de fic sont r--r-x--
+- *chmod 653 fic* en sachant que les droits initiaux de fic sont 711
+- *chmod u+x,g=w,o-r fic* en sachant que les droits initiaux de fic sont r--r-x--14.
+### Aﬀichez les droits sur le programme passwd.
+### Que remarquez-vous? En aﬀichant les droits du fichier /etc/passwd, pouvez-vous justifier les permissions sur le programme passwd?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
