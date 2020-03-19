@@ -373,16 +373,39 @@ ls -l
 > Pour réinitialiser le masque, on doit fermer la session.
 
 ### *Question 11) Définissez un umask très permissif qui autorise tout le monde à lire vos fichiers et traverser vos répertoires, mais n’autorise que vous à écrire. Testez sur un nouveau fichier et un nouveau répertoire.*
+> Le umask doit etre 022
+```bash
+umask 022
+touch fichier3
+mkdir test3
+ls -l 
+```
+> Les droits pour fichier 2 et test2 sont respectivement : -rw-r--r-- et test3 : drwxr-xr-x
 
 ### *Question 12) Définissez un umask équilibré qui vous autorise un accès complet et autorise un accès en lecture aux membres de votre groupe. Testez sur un nouveau fichier et un nouveau répertoire.*
+> Le umask doit etre 037
+```bash
+umask 037
+touch fichier4
+mkdir test4
+ls -l 
+```
+> Les droits pour fichier 2 et test2 sont respectivement : -rw-r----- et test3 : drwxr-----
 
 ### *Question 13) Transcrivez les commandes suivantes de la notation classique à la notation octale ou vice-versa (vous pourrez vous aider de la commande stat pour valider vos réponses) :*
-- *chmod u=rx,g=wx,o=r fic*
-- *chmod uo+w,g-rx fic* en sachant que les droits initiaux de fic sont r--r-x--
-- *chmod 653 fic* en sachant que les droits initiaux de fic sont 711
-- *chmod u+x,g=w,o-r fic* en sachant que les droits initiaux de fic sont r--r-x--14.
-### Aﬀichez les droits sur le programme passwd.
-### Que remarquez-vous? En aﬀichant les droits du fichier /etc/passwd, pouvez-vous justifier les permissions sur le programme passwd?
+- *chmod u=rx,g=wx,o=r fic* -> *chmod 534 fic* 
+- *chmod uo+w,g-rx fic* en sachant que les droits initiaux de fic sont r--r-x--- -> *chmod 501 fic* 
+- *chmod 653 fic* en sachant que les droits initiaux de fic sont 711 -> *chmod u=rx,g=wx,o=r fic*
+- *chmod u+x,g=w,o-r fic* en sachant que les droits initiaux de fic sont r--r-x--14 -> *chmod u-x,g+r,o+w fic*
+
+### *Question 14) Aﬀichez les droits sur le programme passwd. Que remarquez-vous? En aﬀichant les droits du fichier /etc/passwd, pouvez-vous justifier les permissions sur le programme passwd?*
+
+```bash
+ll /etc/passwd
+```
+> Les droits sur le programme passwd sont : -rw-r--r--
+> Les droits parraissent logique, seul l'utilisateur a le droit d'écriture dans passwd, donc seul lui a le droit de modifier son mot de passe. Ensuite le fichier est lisible par tout le monde car on ne peut y lire que les utilisateurs enregistrés mais pas leur mot de passe. 
+
 
 
 
